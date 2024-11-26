@@ -304,6 +304,8 @@ images:
       # We need access to artifactory.infra.corp.arista.io
       # to make mock work
       share-net: true
+    finalizers:
+      - [ "chmod", "777", "/var/eext" ]
 
   eext-testfloor:
     units:

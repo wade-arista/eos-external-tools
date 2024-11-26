@@ -277,7 +277,7 @@ images:
         build: |
           mkdir -p $DESTDIR/usr/share/eext
           cp /src/1/configfiles/* $DESTDIR/usr/share/eext
-          chown -R ugo+rw $DESTDIR/usr/share/eext
+          chmod -R ugo+rw $DESTDIR/usr/share/eext
           mkdir -p $DESTDIR/etc/pki/eext
           cp -a /src/2/pki/* $DESTDIR/etc/pki/eext
 

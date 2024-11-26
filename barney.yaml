@@ -4,7 +4,7 @@ generators:
   go: barney.ci/golang%generator
 
 vars:
-  - &mock-uid 1000
+  - &mock-uid "1000"
 
 images:
 
@@ -277,6 +277,7 @@ images:
         build: |
           mkdir -p $DESTDIR/usr/share/eext
           cp /src/1/configfiles/* $DESTDIR/usr/share/eext
+          chown -R ugo+rw $DESTDIR/usr/share/eext
           mkdir -p $DESTDIR/etc/pki/eext
           cp -a /src/2/pki/* $DESTDIR/etc/pki/eext
 
@@ -305,7 +306,42 @@ images:
       # to make mock work
       share-net: true
     finalizers:
-      - [ "chmod", "777", "/var/eext" ]
+      - [ "chown", *mock-uid, "/var/eext" ]
+
+  mutables:
+    units:
+      - build: |
+          for d in /var/eext /var/lib/mock /var/lib/rpm; do
+            mkdir -p $DESTDIR/${d}
+            chown 1000 $DESTDIR/${d}
+            chmod ugo+rwx $DESTDIR/${d}
+          done
+
+  myfloor:
+    entry:
+      mutables: *eext-mutables
+    units:
+      - image: barney.ci/alpine%pkg/alpine-base
+      - image: barney.ci/alpine%pkg/bash
+      - image: barney.ci/alpine%pkg/coreutils
+      - image: barney.ci/alpine%pkg/shadow
+      - image: barney.ci/alpine%pkg/grep
+      - image: barney.ci/alpine%pkg/findmnt
+      - image: .%mutables
+    finalizers:
+      - [ groupadd, -g, *mock-uid, mockbuild ]
+      - [ useradd, -u, *mock-uid, -g, mockbuild, mockbuild ]
+
+  onfloor:
+    units:
+      - floor: .%myfloor
+        build: |
+          grep mockbuild /etc/passwd
+          for d in /var/eext /var/lib/mock /var/lib/rpm; do
+            ls -ld $d
+            findmnt $d
+          done
+          false
 
   eext-testfloor:
     units:

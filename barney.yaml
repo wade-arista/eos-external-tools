@@ -3,6 +3,9 @@
 generators:
   go: barney.ci/golang%generator
 
+vars:
+  - &mock-uid 1000
+
 images:
 
   internal/bootstrap/extract/sources:
@@ -179,6 +182,9 @@ images:
           bash /bootstrap/install-rpms/install-rpms.bash \
             --common-rpms-file /bootstrap/install-rpms/rpms-common \
             --extra-rpms-file /bootstrap/install-rpms/rpms-build
+    finalizers:
+      - [ groupadd, -g, *mock-uid, mockbuild ]
+      - [ useradd, -u, *mock-uid, -g, mockbuild, mockbuild ]
 
   base-image-devel:
     units:

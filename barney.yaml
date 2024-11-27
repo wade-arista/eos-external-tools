@@ -183,6 +183,10 @@ images:
             --common-rpms-file /bootstrap/install-rpms/rpms-common \
             --extra-rpms-file /bootstrap/install-rpms/rpms-build
 
+    finalizers:
+      - [ groupadd, -g, *mock-uid, mockbuild ]
+      - [ useradd, -u, *mock-uid, -g, mockbuild, mockbuild ]
+
   base-image-devel:
     units:
       - floor: .%internal/bootstrap-devel
@@ -286,10 +290,6 @@ images:
         build: |
           mkdir -p $DESTDIR/etc
           touch $DESTDIR/etc/resolv.conf
-
-    finalizers:
-      - [ groupadd, -g, *mock-uid, mockbuild ]
-      - [ useradd, -u, *mock-uid, -g, mockbuild, mockbuild ]
 
     entry:
       mutables: &eext-mutables

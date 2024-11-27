@@ -3,6 +3,9 @@
 generators:
   go: barney.ci/golang%generator
 
+vars:
+  - &mock-uid "1000"
+
 images:
 
   internal/bootstrap/extract/sources:
@@ -283,6 +286,10 @@ images:
         build: |
           mkdir -p $DESTDIR/etc
           touch $DESTDIR/etc/resolv.conf
+
+    finalizers:
+      - [ groupadd, -g, *mock-uid, mockbuild ]
+      - [ useradd, -u, *mock-uid, -g, mockbuild, mockbuild ]
 
     entry:
       mutables: &eext-mutables

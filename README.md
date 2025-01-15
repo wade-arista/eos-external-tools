@@ -1,5 +1,7 @@
 # eos-external-tools
 
+NOMERGE
+
 This repo hosts the source for tools for building external packages(RPMs) required for EOS out of Abuild.
 There's a git repository corresponding to each such eos-external(eext) package. The tool to build these
 package is hosted here and is called eext.
